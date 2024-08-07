@@ -1,30 +1,12 @@
-﻿using System.Runtime.Serialization;
+﻿using BuildingBlocks.Exeptions;
+using System.Runtime.Serialization;
 
 namespace Catalog.Api.Exceptions
 {
     [Serializable]
-    internal class ProductNotFoundException : Exception
+    internal class ProductNotFoundException : NotFoundException
     {
-        private Guid id;
-
-        public ProductNotFoundException()
-        {
-        }
-
-        public ProductNotFoundException(Guid id)
-        {
-            this.id = id;
-        }
-
-        public ProductNotFoundException(string? message) : base(message)
-        {
-        }
-
-        public ProductNotFoundException(string? message, Exception? innerException) : base(message, innerException)
-        {
-        }
-
-        protected ProductNotFoundException(SerializationInfo info, StreamingContext context) : base(info, context)
+        public ProductNotFoundException(Guid id) : base("Product", id)
         {
         }
     }
