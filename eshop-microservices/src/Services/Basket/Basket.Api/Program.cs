@@ -2,7 +2,8 @@ using Basket.Api.Data;
 using BuildingBlocks.Behaviors.ValidationBehaviors;
 using BuildingBlocks.Exceptions.Handler;
 using FluentValidation;
-using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using HealthChecks.UI.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 //Add dependency
@@ -13,7 +14,7 @@ builder.Services.AddCarter();
 builder.Services.AddMediatR(config =>
 {
     config.RegisterServicesFromAssemblies(currentAssembly);
-    config.AddOpenBehavior(typeof(ValidationBehavior<,>) );
+    config.AddOpenBehavior(typeof(ValidationBehavior<,>));
 });
 
 builder.Services.AddValidatorsFromAssembly(currentAssembly);
@@ -25,12 +26,22 @@ builder.Services.AddMarten(config =>
 }).UseLightweightSessions();
 
 builder.Services.AddScoped<IBasketRepository, BasketRepository>();
+builder.Services.Decorate<IBasketRepository, CachedBasketRepository>();
+builder.Services.AddHealthChecks()
+    .AddNpgSql(builder.Configuration.GetConnectionString("Database")!)
+    .AddRedis(builder.Configuration.GetConnectionString("Redis")!);
 
-builder.Services.AddScoped<IBasketRepository>(provider => 
+//builder.Services.AddScoped<IBasketRepository>(provider => 
+//{
+//    var basketRepository = provider.GetRequiredService<BasketRepository>();
+//    return new CachedBasketRepository(basketRepository, provider.GetRequiredService<IDistributedCache>());
+//});
+
+builder.Services.AddStackExchangeRedisCache(options =>
 {
-    var basketRepository = provider.GetRequiredService<BasketRepository>();
-    return new CachedBasketRepository(basketRepository, provider.GetRequiredService<IDistributedCache>());
+    options.Configuration = builder.Configuration.GetConnectionString("Redis");
 });
+
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 
 
@@ -39,4 +50,8 @@ var app = builder.Build();
 
 app.MapCarter();
 app.UseExceptionHandler(options => { });
+app.UseHealthChecks("/health", new HealthCheckOptions
+{
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
 app.Run();
