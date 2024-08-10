@@ -10,7 +10,7 @@ public class StoreBasketEndpoint : ICarterModule
     {
         app.MapPost("/basket", async (StoreBasketRequest request, ISender sender) =>
         {
-            var command = new StoreBasketCommand(request.Cart);
+            var command = request.Adapt<StoreBasketCommand>();
 
             var result = await sender.Send(command);
 

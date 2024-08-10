@@ -2,7 +2,7 @@
 
 public interface IBasketRepository
 {
-    Task<ShoppingCart?> GetBasketAsync(string userName, CancellationToken cancellationToken);
-    Task<ShoppingCart> StoreBasketAsync(ShoppingCart basket, CancellationToken cancellationToken);
-    Task<bool> DeleteBasketAsync(string userName, CancellationToken cancellationToken);
+    Task<ShoppingCart> GetBasket(string userName, CancellationToken cancellationToken = default);
+    Task<ShoppingCart> StoreBasket(ShoppingCart basket, CancellationToken cancellationToken = default);
+    Task<bool> DeleteBasket(string userName, CancellationToken cancellationToken = default);
 }
