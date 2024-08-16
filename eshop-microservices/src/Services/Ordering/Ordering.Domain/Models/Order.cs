@@ -18,16 +18,18 @@ public class Order : Aggregate<OrderId>
     public decimal TotalPrice { get => OrderItems.Sum(x => x.Price * x.Quantity); private set { } }
 
 
-    public static Order Create(CustomerId customerId, OrderName orderName, Address shippingAddress, Address billingAddress)
+    public static Order Create(OrderId orderId, CustomerId customerId, OrderName orderName, Address shippingAddress, Address billingAddress, Payment payment)
     {
 
         var order = new Order
         {
+            Id = orderId,
             CustomerId = customerId,
             OrderName = orderName,
             ShippingAddress = shippingAddress,
             BillingAddress = billingAddress,
-            Status = OrderStatus.Pending
+            Status = OrderStatus.Pending,
+            Payment = payment
         };
 
         order.AddDomainEvent(new OrderCreatedEvent(order));
