@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Ordering.Application.Data;
 using Ordering.Domain.Models;
 
 namespace Ordering.Infrasturcture.Data;
 
-internal class ApplicationDbContext : DbContext
+internal class ApplicationDbContext : DbContext, IApplicationDBContext
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
    
